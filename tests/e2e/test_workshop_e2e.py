@@ -24,17 +24,10 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
 
     # 2. 打开编辑页面
     page.get_by_role("link", name="Edit car").click()
-
-    # =========【重点！JS注入赋值，不触发前端校验】=========
-    # 获取Model输入框，直接JS改value
-    page.eval_on_selector('label[for="model"] + input', '''(el) => {
-        el.value = "Accord";
-    }''')
-    # Year输入框JS赋值
-    page.eval_on_selector('label[for="year"] + input', '''(el) => {
-        el.value = "2023";
-    }''')
-    # ======================================================
+    page.get_by_label("Model").clear()
+    page.get_by_label("Model").fill("Accord")
+    page.get_by_label("Year").clear()
+    page.get_by_label("Year").fill("2023")
 
     # 等待按钮启用
     save_btn = page.get_by_role("button", name="Save changes")
