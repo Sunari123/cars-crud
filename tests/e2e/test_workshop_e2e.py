@@ -24,13 +24,16 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
 
     # 2. 打开编辑页面
     page.get_by_role("link", name="Edit car").click()
-    page.get_by_label("Model").clear()
-    page.get_by_label("Model").fill("Accord")
-    page.get_by_label("Model").dispatch_event("input")
+       # 用浏览器原生JS修改输入框，触发change事件
+    model_input = page.get_by_label("Model")
+    model_input.fill("Accord")
+    model_input.dispatch_event("input")
+    model_input.dispatch_event("change")
 
-    page.get_by_label("Year").clear()
-    page.get_by_label("Year").fill("2023")
-    page.get_by_label("Year").dispatch_event("input")
+    year_input = page.get_by_label("Year")
+    year_input.fill("2023")
+    year_input.dispatch_event("input")
+    year_input.dispatch_event("change")
 
     # 等待按钮启用
     save_btn = page.get_by_role("button", name="Save changes")
