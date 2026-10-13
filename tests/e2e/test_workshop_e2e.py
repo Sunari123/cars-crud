@@ -26,9 +26,15 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
     # 2.点编辑链接
     page.get_by_role("link", name="Edit car").click()
 
-    # 3.修改为 Accord，2023，保存
+    # 3.修改为 Accord，2023，保存（先选中清空旧文字）
+    page.get_by_label("Model", exact=True).click()
+    page.keyboard.select_all()
     page.get_by_label("Model", exact=True).fill("Accord")
+
+    page.get_by_label("Year", exact=True).click()
+    page.keyboard.select_all()
     page.get_by_label("Year", exact=True).fill("2023")
+
     page.get_by_role("button", name="Save changes").click()
 
     # 4.校验页面显示更新后内容
