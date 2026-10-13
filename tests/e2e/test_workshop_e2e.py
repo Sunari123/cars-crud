@@ -26,9 +26,9 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
     # 2.点编辑链接
     page.get_by_role("link", name="Edit car").click()
 
-    # 3.修改为 Accord，2023，保存，使用fill内置清空（推荐，比键盘select_all稳定）
+    # 3.修改为 Accord，2023，保存
     model_input = page.get_by_label("Model", exact=True)
-    model_input.fill("")  # 先清空
+    model_input.fill("")
     model_input.fill("Accord")
 
     year_input = page.get_by_label("Year", exact=True)
@@ -36,8 +36,11 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
     year_input.fill("2023")
 
     page.get_by_role("button", name="Save changes").click()
+    
+    # 打印页面完整HTML，CI日志里查看页面内容，判断是否提交成功
+    print(page.content())
 
-    # 4. 页面任意位置找到 Accord 文本即可，不再限制heading标签
+    # 4. 校验文本
     expect(page.get_by_text(re.compile("Accord"))).to_be_visible()
 
     # 5.刷新页面，确认修改依旧存在
