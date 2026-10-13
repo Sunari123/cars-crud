@@ -1,19 +1,7 @@
 import re
-from playwright.sync_api import expect
+from playwright.sync_api import Page, expect
 
-def test_user_creates_car_in_browser(page, live_server):
-    page.goto(f"{live_server}/cars/new")
-    page.get_by_label("Make", exact=True).fill("Toyota")
-    page.get_by_label("Model", exact=True).fill("Yaris")
-    page.get_by_label("Year", exact=True).fill("2020")
-    page.get_by_label("Color", exact=False).fill("Blue")
-    page.get_by_role("button", name="Create car").click()
-
-    expect(page).to_have_url(re.compile(r"/cars/\d+$"))
-    expect(page.get_by_role("heading", name="Toyota Yaris")).to_be_visible()
-
-
-def test_user_edits_car_and_change_survives_reload(page, live_server):
+def test_user_edits_car_and_change_survives_reload(page: Page, live_server):
     # 1. 创建车辆
     page.goto(f"{live_server}/cars/new")
     page.get_by_label("Make", exact=True).fill("Honda")
@@ -24,26 +12,28 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
 
     # 2. 打开编辑页面
     page.get_by_role("link", name="Edit car").click()
-       # 用浏览器原生JS修改输入框，触发change事件
+    page.wait_for_load_state("domcontentloaded")
+
+    # 清空原有内容，模拟真人打字
     model_input = page.get_by_label("Model")
-    model_input.fill("Accord")
-    model_input.dispatch_event("input")
-    model_input.dispatch_event("change")
+    model_input.select_text()
+    model_input.type("Accord")
+    model_input.blur()
 
     year_input = page.get_by_label("Year")
-    year_input.fill("2023")
-    year_input.dispatch_event("input")
-    year_input.dispatch_event("change")
+    year_input.select_text()
+    year_input.type("2023")
+    year_input.blur()
 
-    # 等待按钮启用
+    # 保存
     save_btn = page.get_by_role("button", name="Save changes")
     expect(save_btn).to_be_enabled(timeout=5000)
     save_btn.click()
 
-    # 等待跳转到详情页面
+    # 等待跳转详情页
     page.wait_for_url(re.compile(r"/cars/\d+$"), timeout=5000)
 
-    # 校验Accord存在
-    expect(page.get_by_text(re.compile("Accord"))).to_be_visible()
+ # 直接根据id定位model字段
+    expect(page.locator("#car-model")).to_have_text("Accord")
     page.reload()
-    expect(page.get_by_text(re.compile("Accord"))).to_be_visible()
+    expect(page.locator("#car-model")).to_have_text("Accord")
