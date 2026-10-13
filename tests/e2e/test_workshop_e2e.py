@@ -31,15 +31,20 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
     model_input.fill("")
     model_input.fill("Accord")
 
-    # 重点修复：number类型年份框，逐个按键输入，解决表单校验disabled问题
+    # 年份number输入框，逐字符输入
     year_input = page.get_by_label("Year", exact=True)
     year_input.fill("")
     year_input.press_sequentially("2023")
 
-    # 等待按钮解除禁用！等到Save changes按钮可以点击
+    # 等待保存按钮启用，再点击
     save_btn = page.get_by_role("button", name="Save changes")
     expect(save_btn).to_be_enabled(timeout=5000)
     save_btn.click()
+    
+    # =========新增调试代码=========
+    print("POST SUBMIT URL:", page.url)
+    print(page.content())
+    # ==============================
 
     # 4. 校验文本
     expect(page.get_by_text(re.compile("Accord"))).to_be_visible()
