@@ -26,8 +26,11 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
     page.get_by_role("link", name="Edit car").click()
     page.get_by_label("Model").clear()
     page.get_by_label("Model").fill("Accord")
+    page.get_by_label("Model").dispatch_event("input")
+
     page.get_by_label("Year").clear()
     page.get_by_label("Year").fill("2023")
+    page.get_by_label("Year").dispatch_event("input")
 
     # 等待按钮启用
     save_btn = page.get_by_role("button", name="Save changes")
