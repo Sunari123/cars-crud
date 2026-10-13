@@ -61,13 +61,16 @@ def create_car(database_path: Path, car: CarInput) -> Car:
 
 def update_car(database_path: Path, car_id: int, car: CarInput) -> Car | None:
     with connect(database_path) as connection:
-        cursor = connection.execute(
+        # 先查这个车是否存在
+        row = connection.execute("SELECT id FROM cars WHERE id = ?", (car_id,)).fetchone()
+        if row is None:
+            return None
+        # 存在，执行更新
+        connection.execute(
             "UPDATE cars SET make = ?, model = ?, year = ?, color = ? WHERE id = ?",
             (car.make, car.model, car.year, car.color, car_id),
         )
-        if cursor.rowcount == 0:
-            return None
-        return Car(id=car_id, **car.model_dump())
+        return Car(id=car_id,** car.model_dump())
 
 
 def delete_car(database_path: Path, car_id: int) -> bool:
