@@ -14,9 +14,19 @@ jobs:
   tests:
     runs-on: ubuntu-latest
     steps:
-      # ……这里一堆你原本的test步骤（不用动！）
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run tests
+        run: pytest
 
-  # =========在这里粘贴publish整块代码，前面2空格，和tests对齐！=========
   publish:
     needs: tests
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
