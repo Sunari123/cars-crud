@@ -26,19 +26,20 @@ def test_user_edits_car_and_change_survives_reload(page, live_server):
     # 2.点编辑链接
     page.get_by_role("link", name="Edit car").click()
 
-    # 3.修改为 Accord，2023，保存
+    # 3.修改Model
     model_input = page.get_by_label("Model", exact=True)
     model_input.fill("")
     model_input.fill("Accord")
 
+    # 重点修复：number类型年份框，逐个按键输入，解决表单校验disabled问题
     year_input = page.get_by_label("Year", exact=True)
     year_input.fill("")
-    year_input.fill("2023")
+    year_input.press_sequentially("2023")
 
-    page.get_by_role("button", name="Save changes").click()
-    
-    # 打印页面完整HTML，CI日志里查看页面内容，判断是否提交成功
-    print(page.content())
+    # 等待按钮解除禁用！等到Save changes按钮可以点击
+    save_btn = page.get_by_role("button", name="Save changes")
+    expect(save_btn).to_be_enabled(timeout=5000)
+    save_btn.click()
 
     # 4. 校验文本
     expect(page.get_by_text(re.compile("Accord"))).to_be_visible()
