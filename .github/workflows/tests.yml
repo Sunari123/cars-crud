@@ -48,6 +48,7 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/cars-crud:latest
+          load: true   # 加上这一行！！load: true，构建完成后把镜像加载到本地
 
       - name: Export docker image to tar
         run: |
