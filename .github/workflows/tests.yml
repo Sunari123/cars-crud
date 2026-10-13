@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ main ]
   push:
-    branches: [ main ]
+    branches: [ main, docker-image-workflow ]
 
 permissions:
   contents: read
@@ -18,7 +18,7 @@ jobs:
   # =========在这里粘贴publish整块代码，前面2空格，和tests对齐！=========
   publish:
     needs: tests
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source code
